@@ -20,20 +20,21 @@ enum UserStatus {
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  username     String  @unique
-  email        String? @unique
+  id           Int                  @id @default(autoincrement())
+  username     String               @unique
+  email        String?              @unique
   passwordHash String
-  firstname String?
-  lastname  String?
-  phone     String?
-  role   Role       @default(USER)
-  status UserStatus @default(ACTIVE)
-  lastLoginAt DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  sessions    Session[]
-  resetTokens PasswordResetToken[]
+  firstname    String?
+  lastname     String?
+  phone        String?
+  role         Role                 @default(USER)
+  status       UserStatus           @default(ACTIVE)
+  lastLoginAt  DateTime?
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  sessions     Session[]
+  resetTokens  PasswordResetToken[]
+  driver       Driver?
 
   @@index([username])
   @@index([email])
@@ -41,30 +42,150 @@ model User {
 }
 
 model Session {
-  id Int @id @default(autoincrement())
-  userId Int
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  refreshTokenHash String @unique
-  userAgent String?
-  ipAddress String?
-  expiresAt DateTime
-  revokedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               Int       @id @default(autoincrement())
+  userId           Int
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refreshTokenHash String    @unique
+  userAgent        String?
+  ipAddress        String?
+  expiresAt        DateTime
+  revokedAt        DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   @@index([userId])
   @@index([expiresAt])
 }
 
 model PasswordResetToken {
-  id Int @id @default(autoincrement())
-  userId Int
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        Int       @id @default(autoincrement())
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   @@index([userId])
   @@index([expiresAt])
+}
+
+enum TripStatus {
+  DRAFT
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum BillingStatus {
+  NOT_BILLED
+  BILLED
+  PAID
+}
+
+enum DriverStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum TruckStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+}
+
+model Driver {
+  id        Int          @id @default(autoincrement())
+  code      String?      @unique
+  firstname String
+  lastname  String?
+  phone     String?
+  status    DriverStatus @default(ACTIVE)
+
+  userId Int?  @unique
+  user   User? @relation(fields: [userId], references: [id])
+
+  trips Trip[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Truck {
+  id       Int         @id @default(autoincrement())
+  plateNo  String      @unique
+  province String?
+  status   TruckStatus @default(ACTIVE)
+
+  trips Trip[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Customer {
+  id      Int     @id @default(autoincrement())
+  name    String
+  phone   String?
+  taxId   String?
+  address String?
+
+  trips Trip[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Trip {
+  id Int @id @default(autoincrement())
+
+  tripDate DateTime
+
+  driverId Int?
+  driver   Driver? @relation(fields: [driverId], references: [id])
+
+  truckId Int?
+  truck   Truck? @relation(fields: [truckId], references: [id])
+
+  customerId Int?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+
+  jobType     String?
+  bookingNo   String?
+  containerNo String?
+
+  origin      String?
+  destination String?
+  distanceKm  Decimal? @db.Decimal(10, 2)
+
+  freightPrice    Decimal  @default(0) @db.Decimal(12, 2)
+  subcontractCost Decimal? @db.Decimal(12, 2)
+  advanceAmount   Decimal? @db.Decimal(12, 2)
+
+  pickupFee      Decimal? @db.Decimal(12, 2)
+  shoreFee       Decimal? @db.Decimal(12, 2)
+  returnFee      Decimal? @db.Decimal(12, 2)
+  portFee        Decimal? @db.Decimal(12, 2)
+  dropFee        Decimal? @db.Decimal(12, 2)
+  tollFee        Decimal? @db.Decimal(12, 2)
+  maintenanceFee Decimal? @db.Decimal(12, 2)
+  electricFee    Decimal? @db.Decimal(12, 2)
+  prepaidExpense Decimal? @db.Decimal(12, 2)
+
+  netProfit          Decimal? @db.Decimal(12, 2)
+  reimbursableAmount Decimal? @db.Decimal(12, 2)
+
+  tripStatus    TripStatus    @default(COMPLETED)
+  billingStatus BillingStatus @default(NOT_BILLED)
+
+  note String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tripDate])
+  @@index([driverId])
+  @@index([truckId])
+  @@index([customerId])
+  @@index([billingStatus])
 }

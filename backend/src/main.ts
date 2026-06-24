@@ -14,7 +14,12 @@ async function bootstrap() {
   const globalPrefix = 'v1';
   app.setGlobalPrefix(globalPrefix);
 
-  app.enableCors();
+  app.enableCors({
+    origin: true,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
 
   app.useGlobalPipes(
     new ValidationPipe({
