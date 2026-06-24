@@ -46,6 +46,29 @@
         </div>
       </div>
     </div>
+    <div class="mb-4 rounded-xl bg-white p-4 shadow-sm">
+      <div class="grid gap-4 md:grid-cols-4">
+        <input v-model="startDate" type="date" class="input" />
+
+        <input v-model="endDate" type="date" class="input" />
+
+        <select v-model="selectedTripStatus" class="input">
+          <option value="">ทุกสถานะเที่ยว</option>
+          <option value="DRAFT">DRAFT</option>
+          <option value="IN_PROGRESS">IN_PROGRESS</option>
+          <option value="COMPLETED">COMPLETED</option>
+          <option value="CANCELLED">CANCELLED</option>
+        </select>
+
+        <select v-model="selectedBillingStatus" class="input">
+          <option value="">ทุกสถานะวางบิล</option>
+          <option value="NOT_BILLED">NOT_BILLED</option>
+          <option value="BILLED">BILLED</option>
+          <option value="PAID">PAID</option>
+        </select>
+      </div>
+    </div>
+
     <div class="overflow-hidden rounded-xl bg-white shadow-sm">
       <div v-if="loading" class="p-6">กำลังโหลดข้อมูล...</div>
 
@@ -167,22 +190,44 @@ async function deleteTrip(id: number) {
 const search = ref("");
 
 const filteredTrips = computed(() => {
-  const keyword = search.value.toLowerCase();
-
-  if (!keyword) return trips.value;
-
   return trips.value.filter((trip) => {
-    return [
-      trip.bookingNo,
-      trip.containerNo,
-      trip.origin,
-      trip.destination,
-      trip.customer?.name,
-      trip.driver?.firstname,
-      trip.truck?.plateNo,
-    ]
-      .filter(Boolean)
-      .some((value) => String(value).toLowerCase().includes(keyword));
+    const keyword = search.value.toLowerCase();
+
+    const matchKeyword =
+      !keyword ||
+      [
+        trip.bookingNo,
+        trip.containerNo,
+        trip.origin,
+        trip.destination,
+        trip.customer?.name,
+        trip.driver?.firstname,
+        trip.truck?.plateNo,
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(keyword));
+
+    const matchTripStatus =
+      !selectedTripStatus.value || trip.tripStatus === selectedTripStatus.value;
+
+    const matchBillingStatus =
+      !selectedBillingStatus.value ||
+      trip.billingStatus === selectedBillingStatus.value;
+
+    const tripDate = new Date(trip.tripDate);
+
+    const matchStartDate =
+      !startDate.value || tripDate >= new Date(startDate.value);
+
+    const matchEndDate = !endDate.value || tripDate <= new Date(endDate.value);
+
+    return (
+      matchKeyword &&
+      matchTripStatus &&
+      matchBillingStatus &&
+      matchStartDate &&
+      matchEndDate
+    );
   });
 });
 
@@ -207,6 +252,12 @@ const notBilledCount = computed(
     filteredTrips.value.filter((trip) => trip.billingStatus === "NOT_BILLED")
       .length,
 );
+
+const selectedTripStatus = ref("");
+const selectedBillingStatus = ref("");
+
+const startDate = ref("");
+const endDate = ref("");
 
 onMounted(loadTrips);
 </script>
