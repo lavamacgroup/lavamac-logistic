@@ -31,7 +31,9 @@
           >
             <td class="p-3">{{ driver.code || "-" }}</td>
 
-            <td class="p-3">{{ driver.firstname }} {{ driver.lastname || "" }}</td>
+            <td class="p-3">
+              {{ driver.firstname }} {{ driver.lastname || "" }}
+            </td>
 
             <td class="p-3">
               {{ driver.phone || "-" }}
@@ -43,9 +45,15 @@
 
             <td class="p-3">
               <div class="flex justify-center gap-2">
-                <UButton size="xs" :to="`/drivers/${driver.id}`"> ดู/แก้ไข </UButton>
+                <UButton size="xs" :to="`/drivers/${driver.id}`">
+                  ดู/แก้ไข
+                </UButton>
 
-                <UButton size="xs" color="error" @click="deleteDriver(driver.id)">
+                <UButton
+                  size="xs"
+                  color="error"
+                  @click="deleteDriver(driver.id)"
+                >
                   ลบ
                 </UButton>
               </div>
@@ -76,7 +84,13 @@ const filteredDrivers = computed(() => {
   if (!keyword) return drivers.value;
 
   return drivers.value.filter((driver) => {
-    return [driver.code, driver.firstname, driver.lastname, driver.phone, driver.status]
+    return [
+      driver.code,
+      driver.firstname,
+      driver.lastname,
+      driver.phone,
+      driver.status,
+    ]
       .filter(Boolean)
       .some((value) => String(value).toLowerCase().includes(keyword));
   });
