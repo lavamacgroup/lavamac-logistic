@@ -18,6 +18,8 @@
             <th class="p-3">รหัส</th>
             <th class="p-3">ชื่อ</th>
             <th class="p-3">เบอร์โทร</th>
+            <th class="p-3">ธนาคาร</th>
+            <th class="p-3">เลขบัญชี</th>
             <th class="p-3">สถานะ</th>
             <th class="p-3 text-center">จัดการ</th>
           </tr>
@@ -31,29 +33,25 @@
           >
             <td class="p-3">{{ driver.code || "-" }}</td>
 
-            <td class="p-3">
-              {{ driver.firstname }} {{ driver.lastname || "" }}
-            </td>
+            <td class="p-3">{{ driver.firstname }} {{ driver.lastname || "" }}</td>
 
             <td class="p-3">
               {{ driver.phone || "-" }}
             </td>
-
+            <td class="p-3">
+              {{ driver.bankName || "-" }}
+            </td>
+            <td class="p-3">
+              {{ driver.bankAccountNo || "-" }}
+            </td>
             <td class="p-3">
               {{ driver.status }}
             </td>
-
             <td class="p-3">
               <div class="flex justify-center gap-2">
-                <UButton size="xs" :to="`/drivers/${driver.id}`">
-                  ดู/แก้ไข
-                </UButton>
+                <UButton size="xs" :to="`/drivers/${driver.id}`"> ดู/แก้ไข </UButton>
 
-                <UButton
-                  size="xs"
-                  color="error"
-                  @click="deleteDriver(driver.id)"
-                >
+                <UButton size="xs" color="error" @click="deleteDriver(driver.id)">
                   ลบ
                 </UButton>
               </div>
@@ -90,6 +88,8 @@ const filteredDrivers = computed(() => {
       driver.lastname,
       driver.phone,
       driver.status,
+      driver.bankName,
+      driver.bankAccountNo,
     ]
       .filter(Boolean)
       .some((value) => String(value).toLowerCase().includes(keyword));

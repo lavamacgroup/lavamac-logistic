@@ -46,6 +46,9 @@ export class DriversService {
         firstname: dto.firstname,
         lastname: dto.lastname,
         phone: dto.phone,
+        bankName: dto.bankName,
+        bankAccountNo: dto.bankAccountNo,
+        bankAccountName: dto.bankAccountName,
       },
     });
   }
@@ -73,6 +76,9 @@ export class DriversService {
         firstname: dto.firstname,
         lastname: dto.lastname,
         phone: dto.phone,
+        bankName: dto.bankName,
+        bankAccountNo: dto.bankAccountNo,
+        bankAccountName: dto.bankAccountName,
       },
     });
   }

@@ -15,4 +15,16 @@ export class CreateDriverDto {
   @IsOptional()
   @IsString()
   phone?: string;
+
+  @IsOptional()
+  @IsString()
+  bankName?: string;
+
+  @IsOptional()
+  @IsString()
+  bankAccountNo?: string;
+
+  @IsOptional()
+  @IsString()
+  bankAccountName?: string;
 }

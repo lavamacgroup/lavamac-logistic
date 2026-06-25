@@ -102,6 +102,10 @@ model Driver {
   phone     String?
   status    DriverStatus @default(ACTIVE)
 
+  bankName        String?
+  bankAccountNo   String?
+  bankAccountName String?
+
   userId Int?  @unique
   user   User? @relation(fields: [userId], references: [id])
 
